@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>AR Kartvizit - Stabil ve Sabit</title>
+    <title>AR Kartvizit - Kalıcı Model</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.4/dist/mindar-image.prod.js"></script>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
@@ -35,7 +35,7 @@
     <button id="start-ar">AR’yi Başlat</button>
 
     <a-scene id="ar-scene"
-             mindar-image="imageTargetSrc: targets.mind; autoStart: false; filterMinCF: 0.1; filterBeta: 0.01; missTolerance: 5;"
+             mindar-image="imageTargetSrc: targets.mind; autoStart: false; filterMinCF: 0.1; filterBeta: 0.01; missTolerance: 10;"
              color-space="sRGB"
              renderer="colorManagement: true, physicallyCorrectLights"
              vr-mode-ui="enabled: false"
@@ -49,9 +49,8 @@
 
       <a-camera position="0 0 0" look-controls></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
+      <a-entity id="holder" visible="false">
 
-        <!-- Vinç modeli kartvizit merkezinde -->
         <a-gltf-model 
           src="#vincc" 
           position="0 0 0.01" 
@@ -59,7 +58,6 @@
           rotation="0 0 0">
         </a-gltf-model>
 
-        <!-- Dubalar: sola dizilmiş, sabit -->
         <a-gltf-model 
           src="#konii" 
           position="-0.5 -0.1 0.01" 
@@ -78,7 +76,6 @@
           scale="0.01 0.01 0.01">
         </a-gltf-model>
 
-        <!-- Web Sitesi yazısı -->
         <a-text 
           value="Web Sitesi" 
           position="0 -0.7 0.05" 
@@ -89,6 +86,8 @@
         </a-text>
 
       </a-entity>
+
+      <a-entity id="tracker" mindar-image-target="targetIndex: 0"></a-entity>
     </a-scene>
 
     <script>
@@ -97,6 +96,19 @@
         scene.systems["mindar-image-system"].start();
         document.getElementById("start-ar").style.display = "none";
       });
+
+      AFRAME.registerComponent("persist-objects", {
+        init: function () {
+          const tracker = document.querySelector("#tracker");
+          const holder = document.querySelector("#holder");
+
+          tracker.addEventListener("targetFound", () => {
+            holder.setAttribute("visible", "true");
+          });
+        }
+      });
+
+      document.querySelector("#tracker").setAttribute("persist-objects", "");
     </script>
   </body>
 </html>
